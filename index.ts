@@ -1,8 +1,24 @@
 import { registerRootComponent } from 'expo';
-
+import TrackPlayer, { Capability, Event } from 'react-native-track-player';
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
 registerRootComponent(App);
+
+async function setupTrackPlayer() {
+  try {
+    await TrackPlayer.setupPlayer();
+    await TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.Stop,
+      ],
+      compactCapabilities: [Capability.Play, Capability.Pause],
+    });
+  } catch {}
+}
+
+setupTrackPlayer();
+
+TrackPlayer.registerPlaybackService(() => require('./trackPlayerService').default);
