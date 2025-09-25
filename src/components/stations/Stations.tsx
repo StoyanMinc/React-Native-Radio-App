@@ -6,6 +6,9 @@ import { styles } from './stations.styles';
 import StationItem from '../stationItem/StationItem';
 import { Station } from '../../types';
 import { GENRE_OPTIONS } from '../../constants';
+import { useStations } from '../../hooks/useStations';
+import { useFavorites } from '../../hooks/useFavorites';
+import { useAudioPlayer } from '../../hooks/useAudioPlayer';
 
 export const initialStations: Station[] = [
     { id: "1", title: "Chill Vibes FM", genre: "Lo-fi / Chillhop" },
@@ -21,33 +24,26 @@ export const initialStations: Station[] = [
 ];
 
 export default function Stations() {
-    const [currentStation, setCurrentStation] = useState<Station | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [stations] = useState<Station[]>(initialStations);
-    const [favoriteStations, setFavoriteStations] = useState<Station[]>([]);
+    const { currentStation, isPlaying, loadAndPlay, togglePlayPause } = useAudioPlayer();
+    const { stations, isLoading, error } = useStations();
+    const { favoriteIds, toggleFavorite } = useFavorites();
     const [genre, setGenre] = useState<string>('All');
     const [showDropdown, setShowDropdown] = useState(false);
 
     const toggleDropdown = () => setShowDropdown(prev => !prev);
     
-    const filteredStations = genre === 'All' ? stations : stations.filter((g => g.genre.includes(genre)))
+    const filteredStations = genre === 'All' ? stations : stations.filter((station => station.genre?.toLowerCase().includes(genre.toLowerCase())));
 
-    const handleSelectStation = (station: Station) => {
-        setCurrentStation(station);
-    };
-
-    const handleTogglePlay = () => {
-        setIsPlaying(prev => !prev);
+    const handlePressPlay = (station: Station) => {
+        if (!currentStation || currentStation.id !== station.id) {
+            loadAndPlay(station);
+        } else {
+            togglePlayPause();
+        }
     };
 
     const handleToggleFavorite = (station: Station) => {
-        setFavoriteStations(prev => {
-            const isFav = prev.find(s => s.id === station.id);
-            if (isFav) {
-                return prev.filter(s => s.id !== station.id);
-            }
-            return [...prev, station];
-        });
+        toggleFavorite(station);
     };
 
     return (
@@ -55,8 +51,6 @@ export default function Stations() {
             <View style={styles.header}>
                 <Text style={styles.headerText}>Just pick your station and listen</Text>
             </View>
-
-            {/* Manual select */}
             <View style={styles.genreContainer}>
                 <TouchableOpacity
                     onPress={toggleDropdown}
@@ -73,6 +67,8 @@ export default function Stations() {
                         <FlatList
                             data={GENRE_OPTIONS}
                             keyExtractor={(item) => item}
+                            style={styles.genreDropdownList}
+                            nestedScrollEnabled
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     onPress={() => {
@@ -88,24 +84,30 @@ export default function Stations() {
                     </View>
                 )}
             </View>
-
-
             <FlatList
                 data={filteredStations}
+                style={styles.list}
                 keyExtractor={(item) => item.id}
+                extraData={favoriteIds}
+                ListEmptyComponent={
+                    isLoading ? (
+                        <Text style={styles.headerText}>Loading stations...</Text>
+                    ) : !!error ? (
+                        <Text style={styles.headerText}>{error}</Text>
+                    ) : (
+                        <Text style={styles.headerText}>No stations</Text>
+                    )
+                }
                 renderItem={({ item }) => (
                     <StationItem
-                        item={item}
+                        item={{ ...item, favorite: favoriteIds.has(item.id) }}
                         currentStation={currentStation}
                         isPlaying={isPlaying}
-                        onSelectStation={handleSelectStation}
-                        onTogglePlay={handleTogglePlay}
+                        onPressPlay={handlePressPlay}
                         onToggleFavorite={handleToggleFavorite}
                     />
                 )}
             />
-
-            {/* Now playing footer */}
             {currentStation && (
                 <View style={styles.currentStationContainer}>
                     <View>
@@ -113,7 +115,7 @@ export default function Stations() {
                         <Text style={styles.currentStationTitle}>{currentStation.title}</Text>
                     </View>
                     <View style={styles.currentStationControls}>
-                        <TouchableOpacity onPress={handleTogglePlay}>
+                        <TouchableOpacity onPress={() => handlePressPlay(currentStation)}>
                             <Ionicons
                                 name={isPlaying ? 'pause' : 'play'}
                                 color={'#fff'}

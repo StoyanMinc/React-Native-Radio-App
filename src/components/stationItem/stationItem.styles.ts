@@ -4,11 +4,18 @@ export const styles = StyleSheet.create({
     stationItem: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        padding: 15,
+        paddingVertical: 15,
+        paddingHorizontal: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
+    },
+    stationInfo: {
+        flex: 1,
+        minWidth: 0,
+        paddingRight: 12,
+        flexShrink: 1,
     },
     stationTitle: {
         color: '#fff',
@@ -22,6 +29,12 @@ export const styles = StyleSheet.create({
     },
     stationAction: {
         flexDirection: 'row',
-        gap: 15,
+        alignItems: 'center',
+        flexShrink: 0,
+        width: 88,
+        justifyContent: 'flex-end',
+    },
+    stationActionSpacer: {
+        marginLeft: 15,
     },
 })

@@ -4,8 +4,9 @@ export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#000',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'stretch',
+        justifyContent: 'flex-start',
+        paddingHorizontal: 0,
     },
     header: {
         marginVertical: 20,
@@ -56,7 +57,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#fff',
-        width: 300
+        width: '100%'
     },
     genreText: {
         fontWeight: 'bold',
@@ -69,8 +70,14 @@ export const styles = StyleSheet.create({
         marginTop: 2,
         backgroundColor: '#fff',
     },
+    genreDropdownList: {
+        maxHeight: 500,
+    },
     genreDropdownText: {
         padding: 12
+    },
+    list: {
+        width: '100%'
     }
 
 })
