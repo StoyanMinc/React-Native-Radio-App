@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, PropsWithChildren } from 'react';
-import TrackPlayer, { AppKilledPlaybackBehavior, Capability, Event, RepeatMode, State, usePlaybackState } from 'react-native-track-player';
+import TrackPlayer, { Capability, State } from 'react-native-track-player';
 import { Station } from '../types';
 
 type AudioPlayerContextValue = {
@@ -28,7 +28,7 @@ export function AudioPlayerProvider({ children }: PropsWithChildren<{}>) {
                     compactCapabilities: [Capability.Play, Capability.Pause],
                 });
                 initializedRef.current = true;
-            } catch {}
+            } catch { }
         })();
         return () => {
             stop();
@@ -39,7 +39,7 @@ export function AudioPlayerProvider({ children }: PropsWithChildren<{}>) {
         try {
             await TrackPlayer.stop();
             await TrackPlayer.reset();
-        } catch {}
+        } catch { }
         setIsPlaying(false);
     }, []);
 

@@ -10,5 +10,6 @@ export const GENRE_OPTIONS = [
     'Classical',
     'Reggae',
     'Country',
-    'Chill'
+    'Chill',
+    'News'
 ]
